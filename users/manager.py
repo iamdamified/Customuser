@@ -4,7 +4,7 @@ from django.contrib.auth.models import (
 from django.db import transaction
 
 class UserManager(BaseUserManager):
-    def _create_user(self, email, password, extra_fields):
+    def _create_user(self, email, password, **extra_fields):
         """
     Creates and saves a User with the given email, and password.
 """
@@ -28,4 +28,10 @@ class UserManager(BaseUserManager):
     def create_superuser(self, email,password=None, **extrafields):
         extrafields.setdefault('is_staff', True)
         extrafields.setdefault('is_superuser', True)
-        return self._create_user(email,password, **extrafields)
+        extrafields.setdefault('is_active', True)
+
+        if extrafields.get("is_staff") is not True:
+            raise ValueError("Superuser must have is_staff=True.")
+        if extrafields.get("is_superuser") is not True:
+            raise ValueError("Superuser must have is_superuser=True.")
+        return self._create_user(email, password, **extrafields)
